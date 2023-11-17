@@ -1,28 +1,25 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
-const cors = require('cors');
-const jwt = require('jsonwebtoken');
+
 const verifyToken = require('./middleware/verifyToken')
+const {login, logout} = require('./app/user/auth_router')
+const userRouter = require('./app/user/user_router')
 require('dotenv').config();
 
 app.use(bodyParser.urlencoded({ extended: false }));
 
-var secret = process.env.SECRET
+// router module
+app.use('/api/login', login)
+app.use('/api/logout', logout)
+app.use('/api/users', verifyToken, userRouter)
 
-app.post('/api/login', (req, res) => {
-  let loginData = {
-    username: req.body.username,
-    password: req.body.password,
-  }
-
-  var token = jwt.sign(loginData, secret, { expiresIn: '1d' });
-  res.send({
-    username: loginData.username,
-    token: token,
-  })
+// public API
+app.get('/api/public', (req, res) => {
+  res.send('API public')
 })
 
+// private API
 app.get('/api/admin', verifyToken, (req, res) => {
   try {
     res.send(req.user)
@@ -30,11 +27,6 @@ app.get('/api/admin', verifyToken, (req, res) => {
     res.send(err.message)
   }
 })
-
-// app.use(function(err, req, res, next){
-//   console.error(err.stack);
-//   return res.set(err.headers).status(err.status).json({ message: err.message });
-// });
 
 app.listen(3000);
 console.log('Listening on http://localhost:3000');

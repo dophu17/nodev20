@@ -20,7 +20,11 @@ var login = router.post('/', (req, res) => {
 })
 
 var logout = router.get('/', (req, res) => {
-	res.send('Logout function')
+	res.send({
+		username: '',
+		token: '',
+		msg: 'Logout function'
+	})
 })
 
 module.exports = {

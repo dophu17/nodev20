@@ -1,16 +1,4 @@
-const mysql = require('mysql')
-
-const sql = mysql.createConnection({
-	host     : 'localhost',
-	user     : 'root',
-	password : '',
-	database : 'nodev20'
-});
-
-sql.connect(error => {
-  if (error) throw error;
-  console.log("Successfully connected to the database.");
-});
+const sql = require('./../db')
 
 const User = function(user) {
   this.username = user.username;

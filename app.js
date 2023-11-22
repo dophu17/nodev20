@@ -2,10 +2,10 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
 
+require('dotenv').config();
 const verifyToken = require('./middleware/verifyToken')
 const {login, logout} = require('./app/user/auth_router')
 const userRouter = require('./app/user/user_router')
-require('dotenv').config();
 
 app.use(bodyParser.urlencoded({ extended: false }));
 

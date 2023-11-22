@@ -1,47 +1,54 @@
-const express = require('express');
-const router = express.Router();
-
-var users = [
-	{id: 1, name: "User1", email: "user1@gmail.com", age: 31}, 
-	{id: 2, name: "User2", email: "user2@gmail.com", age: 20},
-	{id: 3, name: "User3", email: "user3@gmail.com", age: 25}
-];
+const express = require('express')
+const router = express.Router()
+const User = require('./user_model')
 
 router.get('/', function(req, res){
-	res.send({
-		users: users
-	});
-})
-
-router.get('/search', (req,res) => {
-	var name_search = req.query.name
-	var result = users.filter( (user) => {
-		return user.name.toLowerCase().indexOf(name_search.toLowerCase()) !== -1
-	})
-
-	res.send({
-		users: result
-	});
-})
-
-router.get('/create', (req, res) => {
-	res.send('users/create');
-})
-
-router.post('/create', (req, res) => {
-	users.push(req.body);
-	res.send({
-		users: users
-	})
+  let username = req.query.username ?? ''
+  User.getAll(username, (err, rows) => {
+    res.send({
+    	users: rows
+    });
+  })
 })
 
 router.get('/:id', (req, res) => {
-	var user = users.find( (user) => {
-		return user.id == parseInt(req.params.id);
-	});
-	res.send({
-    	user: user
-    })
+  let id = parseInt(req.params.id) ?? ''
+	User.findById(id, (err, rows) => {
+    res.send({
+    	users: rows
+    });
+  })
+})
+
+router.post('/create', (req, res) => {
+  let body = req.body ?? ''
+	User.create(body, (err, rows) => {
+    res.send({
+    	users: rows
+    });
+  })
+})
+
+router.put('/update/:id', (req, res) => {
+  let id = parseInt(req.params.id) ?? ''
+  let body = {
+    username: req.body.username ?? '',
+    password: req.body.password ?? ''
+  }
+	User.updateById(id, body, (err, rows) => {
+    res.send({
+    	users: rows
+    });
+  })
+})
+
+router.delete('/delete/:id', (req, res) => {
+  let id = parseInt(req.params.id) ?? ''
+	User.deleteById(id, (err, rows) => {
+    res.send({
+    	users: rows
+    });
+  })
 })
 
 module.exports = router

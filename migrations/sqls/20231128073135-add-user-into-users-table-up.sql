@@ -1,0 +1,1 @@
+INSERT INTO `users` VALUES (1, 'dophu0011', '2221');

@@ -41,6 +41,24 @@ User.findById = (id, result) => {
   });
 };
 
+User.findByUsername = (username, result) => {
+  sql.query(`SELECT * FROM users WHERE username = '${username}'`, (err, res) => {
+    if (err) {
+      console.log("error: ", err);
+      result(err, null);
+      return;
+    }
+
+    if (res.length) {
+      console.log("found User: ", res[0]);
+      result(null, res[0]);
+      return;
+    }
+
+    result({ kind: "not_found" }, null);
+  });
+};
+
 User.create = (newUser, result) => {
   sql.query("INSERT INTO users SET ?", newUser, (err, res) => {
     if (err) {
@@ -71,6 +89,27 @@ User.updateById = (id, user, result) => {
       }
 
       result(null, { id: id, ...user });
+    }
+  );
+};
+
+User.updateTokenByUsername = (username, token, result) => {
+  sql.query(
+    "UPDATE users SET token = ? WHERE username = ?",
+    [token, username],
+    (err, res) => {
+      if (err) {
+        console.log("error: ", err);
+        result(null, err);
+        return;
+      }
+
+      if (res.affectedRows == 0) {
+        result({ kind: "not_found" }, null);
+        return;
+      }
+
+      result(null, { username: username });
     }
   );
 };

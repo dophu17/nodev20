@@ -1,25 +1,44 @@
 const sql = require('./../db')
+const Pagination = require('../pagination')
 
 const User = function(user) {
   this.username = user.username;
   this.password = user.password;
 };
 
-User.getAll = (username, result) => {
+User.getAll = (username, pageNumber, perPage, result) => {
   let query = "SELECT * FROM users";
+  let queryCount = "SELECT COUNT(id) as totalCount FROM users"
 
   if (username) {
     query += ` WHERE username LIKE '%${username}%'`;
+    queryCount += ` WHERE username LIKE '%${username}%'`;
   }
 
-  sql.query(query, (err, res) => {
-    if (err) {
-      console.log("error: ", err);
-      result(null, err);
+  sql.query(queryCount, (errCount, resCount) => {
+    if (errCount) {
+      console.log("error: ", errCount);
+      result(null, errCount);
       return;
-    }
+    } else {
+      var currentPage = pageNumber > 0 ? pageNumber : 1
+      var pageUri = '/users/'
+      var totalCount = resCount[0].totalCount
+      var Paginate = new Pagination(totalCount, currentPage, pageUri, perPage)
+      query += ` LIMIT ${Paginate.perPage} OFFSET ${Paginate.offset}`
+      sql.query(query, (err, res) => {
+        if (err) {
+          console.log("error: ", err);
+          result(null, err);
+          return;
+        }
 
-    result(null, res);
+        result(null, {
+          users: res,
+          pages: Paginate
+        });
+      });
+    }
   });
 };
 

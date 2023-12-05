@@ -2,11 +2,14 @@ const express = require('express')
 const router = express.Router()
 const User = require('./user_model')
 
-router.get('/', function(req, res){
-  let username = req.query.username ?? ''
-  User.getAll(username, (err, rows) => {
+router.get('/', (req, res) => {
+  var username = req.query.username ?? ''
+  var pageNumber = req.query.page ?? 1
+  var perPage = req.query.perPage ?? 10
+  User.getAll(username, pageNumber, perPage, (err, rows) => {
     res.send({
-    	users: rows
+    	users: rows.users,
+      pages: rows.pages
     });
   })
 })

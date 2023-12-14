@@ -1,6 +1,8 @@
 const express = require('express')
+var { validationResult } = require('express-validator')
 const router = express.Router()
 const User = require('./user_model')
+const { validate } = require('./user_validator')
 
 router.get('/', (req, res) => {
   var username = req.query.username ?? ''
@@ -23,8 +25,15 @@ router.get('/:id', (req, res) => {
   })
 })
 
-router.post('/create', (req, res) => {
+router.post('/create', validate.validateRegister(), (req, res) => {
   let body = req.body ?? ''
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    res.status(422).json({ errors: errors.array() });
+    return;
+  }
+
 	User.create(body, (err, rows) => {
     res.send({
     	users: rows
